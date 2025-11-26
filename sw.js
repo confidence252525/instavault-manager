@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'instavault-v3';
+const CACHE_NAME = 'instavault-v4';
 const urlsToCache = [
   './',
   './index.html',
@@ -80,11 +80,13 @@ self.addEventListener('fetch', (event) => {
         const fetchRequest = event.request.clone();
         return fetch(fetchRequest).then((response) => {
              // Check if valid response
-             // We allow opaque responses for our specific CDNs (Tailwind, Fonts) because they often lack CORS headers when fetched via scripts/links
+             // We allow opaque responses for specific CDNs (Tailwind, Fonts, Placeholders, Unsplash)
              const isOpaqueConfiguredAsset = response.type === 'opaque' && (
                  event.request.url.includes('cdn.tailwindcss.com') ||
                  event.request.url.includes('fonts.googleapis.com') ||
-                 event.request.url.includes('fonts.gstatic.com')
+                 event.request.url.includes('fonts.gstatic.com') ||
+                 event.request.url.includes('via.placeholder.com') ||
+                 event.request.url.includes('images.unsplash.com')
              );
 
              const isValidResponse = response.status === 200 && (response.type === 'basic' || response.type === 'cors');
