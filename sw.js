@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'instavault-v2';
+const CACHE_NAME = 'instavault-v3';
 const urlsToCache = [
   './',
   './index.html',
@@ -41,6 +41,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
+  // 0. Ignore non-http/https requests (e.g. chrome-extension://, data:) to prevent console errors
+  if (!requestUrl.protocol.startsWith('http')) {
+    return;
+  }
+
   // 1. API Calls: Network Only (Never cache)
   if (requestUrl.pathname.includes('/api/') || requestUrl.hostname.includes('googleapis')) {
     // Exception: Cache Google Fonts (CSS and WOFF files)
@@ -50,7 +55,6 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 2. HTML / Navigation: Network First, Fallback to Cache
-  // This ensures the user gets the latest app version if online, but it still works offline.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -71,35 +75,30 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          // Optional: Update cache in background for next time (Stale-while-revalidate)
-          // For immutable CDNs, simple return is fine.
-          return response;
-        }
+        if (response) return response;
 
-        // Clone the request because it's a stream
         const fetchRequest = event.request.clone();
+        return fetch(fetchRequest).then((response) => {
+             // Check if valid response
+             // We allow opaque responses for our specific CDNs (Tailwind, Fonts) because they often lack CORS headers when fetched via scripts/links
+             const isOpaqueConfiguredAsset = response.type === 'opaque' && (
+                 event.request.url.includes('cdn.tailwindcss.com') ||
+                 event.request.url.includes('fonts.googleapis.com') ||
+                 event.request.url.includes('fonts.gstatic.com')
+             );
 
-        return fetch(fetchRequest).then(
-          (response) => {
-            // Check if valid
-            if (!response || response.status !== 200 || response.type !== 'basic' && response.type !== 'cors') {
-              return response;
-            }
+             const isValidResponse = response.status === 200 && (response.type === 'basic' || response.type === 'cors');
 
-            // Clone response
-            const responseToCache = response.clone();
+             if (!isValidResponse && !isOpaqueConfiguredAsset) {
+                 return response;
+             }
 
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                // Cache dynamic assets (like CDN scripts, images)
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        );
+             const responseToCache = response.clone();
+             caches.open(CACHE_NAME).then((cache) => {
+                 cache.put(event.request, responseToCache);
+             });
+             return response;
+        });
       })
   );
 });
