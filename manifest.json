@@ -25,18 +25,18 @@
   ],
   "screenshots": [
     {
-      "src": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop",
-      "sizes": "1080x1920",
+      "src": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1920&h=1080&auto=format&fit=crop",
+      "sizes": "1920x1080",
       "type": "image/jpeg",
       "form_factor": "wide",
-      "label": "Dashboard Overview"
+      "label": "Desktop Dashboard"
     },
     {
-      "src": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?q=80&w=600&auto=format&fit=crop",
-      "sizes": "600x1000",
+      "src": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?q=80&w=1080&h=1920&auto=format&fit=crop",
+      "sizes": "1080x1920",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Mobile Cleaner Interface"
+      "label": "Mobile Interface"
     }
   ]
 }
