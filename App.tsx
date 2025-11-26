@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -18,38 +17,8 @@ const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
   const [showIntro, setShowIntro] = useState(true);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
-  const [apiKeyReady, setApiKeyReady] = useState(false);
-  const [checkingKey, setCheckingKey] = useState(true);
-  const [manualKey, setManualKey] = useState('');
 
   useEffect(() => {
-    const checkKey = async () => {
-      // 1. Check Local Storage first (for deployed apps)
-      const storedKey = localStorage.getItem('gemini_api_key');
-      if (storedKey) {
-        setApiKeyReady(true);
-        setCheckingKey(false);
-        return;
-      }
-
-      // 2. Check AI Studio Environment
-      if (window.aistudio) {
-        try {
-          const hasKey = await window.aistudio.hasSelectedApiKey();
-          setApiKeyReady(hasKey);
-        } catch (e) {
-          console.error("Failed to check API key:", e);
-          setApiKeyReady(false);
-        }
-      } else {
-        // 3. Check Environment Variable
-        setApiKeyReady(!!process.env.API_KEY);
-      }
-      setCheckingKey(false);
-    };
-    
-    checkKey();
-
     const handler = (e: any) => {
       e.preventDefault();
       setInstallPrompt(e);
@@ -58,28 +27,6 @@ const AppContent: React.FC = () => {
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
-
-  const handleSelectKey = async () => {
-    if (window.aistudio) {
-      try {
-        await window.aistudio.openSelectKey();
-        const hasKey = await window.aistudio.hasSelectedApiKey();
-        setApiKeyReady(hasKey);
-      } catch (e) {
-        console.error("Key selection failed:", e);
-        setApiKeyReady(false);
-      }
-    }
-  };
-
-  const handleManualSave = () => {
-    if (manualKey.trim().length > 10) {
-      localStorage.setItem('gemini_api_key', manualKey.trim());
-      setApiKeyReady(true);
-    } else {
-      alert("Please enter a valid API Key.");
-    }
-  };
 
   const handleInstall = () => {
     if (!installPrompt) return;
@@ -125,71 +72,6 @@ const AppContent: React.FC = () => {
       default: return 'InstaVault';
     }
   };
-
-  if (checkingKey) {
-    return (
-      <div className="min-h-screen bg-canvas-950 flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary-500" size={32} />
-      </div>
-    );
-  }
-
-  if (!apiKeyReady) {
-    return (
-      <div className="min-h-screen bg-canvas-950 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-canvas-900 border border-canvas-800 rounded-3xl p-8 text-center shadow-2xl animate-fade-in">
-          <div className="w-20 h-20 bg-primary-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Key className="text-primary-400" size={40} />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Connect API Key</h2>
-          <p className="text-canvas-400 mb-6 leading-relaxed text-sm">
-            To use the AI features, please provide your Gemini API Key.
-          </p>
-          
-          {/* AI Studio Selection (Hidden on Mobile/Deployed usually) */}
-          {window.aistudio && (
-            <div className="mb-6">
-                <button 
-                    onClick={handleSelectKey}
-                    className="w-full py-3 bg-canvas-800 hover:bg-canvas-700 text-white rounded-xl font-medium transition-all border border-canvas-700 flex items-center justify-center gap-2 mb-4"
-                >
-                    <Key size={18} /> Select via Google Cloud
-                </button>
-                <div className="relative flex py-2 items-center">
-                    <div className="flex-grow border-t border-canvas-800"></div>
-                    <span className="flex-shrink-0 mx-4 text-canvas-600 text-xs">OR ENTER MANUALLY</span>
-                    <div className="flex-grow border-t border-canvas-800"></div>
-                </div>
-            </div>
-          )}
-
-          {/* Manual Entry */}
-          <div className="space-y-3">
-             <input 
-                type="password" 
-                placeholder="Paste your API Key here (AIza...)"
-                className="w-full bg-canvas-950 border border-canvas-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500 transition-colors text-center"
-                value={manualKey}
-                onChange={(e) => setManualKey(e.target.value)}
-             />
-             <button 
-                onClick={handleManualSave}
-                disabled={manualKey.length < 10}
-                className="w-full py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all shadow-lg shadow-primary-600/20 flex items-center justify-center gap-2"
-             >
-                Connect App <ArrowRight size={18} />
-             </button>
-          </div>
-
-          <p className="text-xs text-canvas-600 mt-6">
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="underline hover:text-canvas-400">
-              Get an API Key
-            </a>
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (showIntro) {
     return <Intro onComplete={() => setShowIntro(false)} />;

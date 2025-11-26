@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Lock, Bell, HelpCircle, ChevronRight, Moon, Smartphone, Shield, Download, Info, ChevronDown, Palette } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Lock, Bell, HelpCircle, ChevronRight, Moon, Smartphone, Shield, Download, Info, ChevronDown, Palette, Key, Save, Check } from 'lucide-react';
 import { ViewState } from '../types';
 import { useTheme, ThemeName } from '../contexts/ThemeContext';
 
@@ -13,6 +13,25 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate, installPrompt, onInstal
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const { theme, setTheme } = useTheme();
+  
+  // API Key State
+  const [apiKey, setApiKey] = useState('');
+  const [keySaved, setKeySaved] = useState(false);
+
+  useEffect(() => {
+    const storedKey = localStorage.getItem('gemini_api_key');
+    if (storedKey) setApiKey(storedKey);
+  }, []);
+
+  const handleSaveKey = () => {
+      if (apiKey.trim().length > 10) {
+          localStorage.setItem('gemini_api_key', apiKey.trim());
+          setKeySaved(true);
+          setTimeout(() => setKeySaved(false), 2000);
+      } else {
+          alert("Please enter a valid API Key.");
+      }
+  };
 
   const handleToggle = (setter: React.Dispatch<React.SetStateAction<boolean>>, value: boolean) => {
     setter(!value);
@@ -30,7 +49,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate, installPrompt, onInstal
   ];
 
   return (
-    <div className="animate-fade-in max-w-2xl mx-auto">
+    <div className="animate-fade-in max-w-2xl mx-auto pb-10">
       <h2 className="text-2xl font-bold text-white mb-6">Settings</h2>
       
       {/* Profile Card */}
@@ -52,6 +71,38 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate, installPrompt, onInstal
 
       {/* Settings Groups */}
       <div className="space-y-6">
+
+        {/* API Key Configuration */}
+        <div>
+           <h4 className="text-canvas-500 text-xs font-semibold uppercase tracking-wider mb-3 px-2">API Configuration</h4>
+           <div className="bg-canvas-800/50 border border-canvas-700 rounded-2xl overflow-hidden p-4">
+              <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-canvas-700/50 text-primary-400">
+                      <Key size={18} />
+                  </div>
+                  <span className="font-medium text-canvas-200">Gemini API Key</span>
+              </div>
+              <div className="flex gap-2">
+                  <input 
+                    type="password" 
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Paste your AIza... key here"
+                    className="flex-1 bg-canvas-900 border border-canvas-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500 text-sm"
+                  />
+                  <button 
+                    onClick={handleSaveKey}
+                    className={`px-4 py-2 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${keySaved ? 'bg-emerald-600 text-white' : 'bg-primary-600 hover:bg-primary-500 text-white'}`}
+                  >
+                    {keySaved ? <Check size={16} /> : <Save size={16} />}
+                    {keySaved ? 'Saved' : 'Save'}
+                  </button>
+              </div>
+              <p className="text-xs text-canvas-500 mt-2">
+                  Required for Backup Analysis. The key is stored locally on your device.
+              </p>
+           </div>
+        </div>
         
         {/* Group 1: Account & Security */}
         <div>
@@ -91,7 +142,7 @@ const Settings: React.FC<SettingsProps> = ({ onNavigate, installPrompt, onInstal
                     </div>
                     <span className="font-medium text-canvas-200">App Theme</span>
                 </div>
-                <div className="flex gap-2 pl-12">
+                <div className="flex gap-2 pl-12 flex-wrap">
                     {themes.map((t) => (
                         <button 
                             key={t.id}

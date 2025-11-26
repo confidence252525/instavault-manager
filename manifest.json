@@ -1,1 +1,43 @@
-{"id":"com.instavault.manager","start_url":"/?source=pwa","scope":"/","icons":[{"src":"icon-192x192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon-512x512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}],"screenshots":[{"src":"screenshot1.png","label":"Improved Label 1"},{"src":"screenshot2.png","label":"Improved Label 2"}]}
+{
+  "id": ".",
+  "name": "InstaVault Data Manager",
+  "short_name": "InstaVault",
+  "description": "Securely manage your social media footprint, analyze chat backups with AI, and protect your privacy.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities", "social"],
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png/0f172a/22c55e?text=IV",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png/0f172a/22c55e?text=InstaVault",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1920&h=1080&auto=format&fit=crop",
+      "sizes": "1920x1080",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Desktop Dashboard"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?q=80&w=1080&h=1920&auto=format&fit=crop",
+      "sizes": "1080x1920",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Mobile Interface"
+    }
+  ]
+}
