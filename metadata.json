@@ -1,0 +1,5 @@
+{
+  "name": "InstaVault Data Manager",
+  "description": "A comprehensive dashboard to visualize, analyze (via Gemini AI), and manage social media message backups. Features a simulated message cleaner and insight generator.",
+  "requestFramePermissions": []
+}
